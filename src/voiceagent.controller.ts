@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './voiceagent.service';
+import { VoiceAgentService } from './voiceagent.service';
 
-@Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+@Controller('vapi')
+export class VoiceAgentController {
+  constructor(private readonly voiceAgentService: VoiceAgentService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('calls-today')
+  async getCallsToday(): Promise<any> {
+    return this.voiceAgentService.getCallsToday();
   }
 }
