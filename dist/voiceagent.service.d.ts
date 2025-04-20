@@ -2,7 +2,16 @@ export declare class VoiceAgentService {
     private readonly vapi_api_key;
     private readonly assistant_id;
     private readonly phone_number_id;
+    private readonly db_host;
+    private readonly db_username;
+    private readonly db_password;
+    private readonly db_database;
+    private readonly db_port;
     private client;
+    private pool;
     constructor();
+    onModuleInit(): Promise<void>;
+    onModuleDestroy(): Promise<void>;
     getCallsToday(): Promise<any>;
+    saveTodaysCalls(): Promise<any>;
 }

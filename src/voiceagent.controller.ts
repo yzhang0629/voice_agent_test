@@ -9,4 +9,8 @@ export class VoiceAgentController {
   async getCallsToday(): Promise<any> {
     return this.voiceAgentService.getCallsToday();
   }
+  @Get('transcript')
+  async getTranscript(): Promise<any> {
+    return this.voiceAgentService.saveTodaysCalls();
+  }
 }

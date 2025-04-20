@@ -20,6 +20,9 @@ let VoiceAgentController = class VoiceAgentController {
     async getCallsToday() {
         return this.voiceAgentService.getCallsToday();
     }
+    async getTranscript() {
+        return this.voiceAgentService.saveTodaysCalls();
+    }
 };
 exports.VoiceAgentController = VoiceAgentController;
 __decorate([
@@ -28,6 +31,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], VoiceAgentController.prototype, "getCallsToday", null);
+__decorate([
+    (0, common_1.Get)('transcript'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], VoiceAgentController.prototype, "getTranscript", null);
 exports.VoiceAgentController = VoiceAgentController = __decorate([
     (0, common_1.Controller)('vapi'),
     __metadata("design:paramtypes", [voiceagent_service_1.VoiceAgentService])
