@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { config } from 'dotenv';
-import { ConfigService } from "@nestjs/config";
+import { Cron } from '@nestjs/schedule';
 import { VapiClient } from "@vapi-ai/server-sdk";
 import { createPool, Pool } from "mysql2/promise";
 
@@ -33,17 +33,37 @@ export class VoiceAgentService {
       port: Number(this.db_port),
       connectionLimit: 10
     });
-    await this.pool.query('SELECT 1')
-    console.log('MySQL pool created successfully');
   }
   async onModuleDestroy() {
     await this.pool.end();
     console.log('MySQL pool destroyed successfully');
   }
+  @Cron('59 23 * * *')
+  async cronSaveCallsToday() {
+    await this.saveTodaysCalls();
+  }
   async getCallsToday() : Promise<any> {
     try {
       const result = await this.client.calls.list({
-        createdAtGe : new Date(new Date().setHours(0, 0, 0, 0)).toISOString()
+        createdAtGe : new Date(new Date().setHours(0, -1, 0, 0)).toISOString()
+      });
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        `VAPI API request failed: ${error.message}`,
+        error.response?.status || 500,
+      );
+    }
+  }
+  async getCallsInRange(startDaysAgo: number, endDaysAgo: number): Promise<any> {
+    try {
+      const startDate = new Date(new Date().setHours(0, -1, 0, 0));
+      startDate.setDate(startDate.getDate() - startDaysAgo);
+      const endDate = new Date(new Date().setHours(0, -1, 0, 0));
+      endDate.setDate(endDate.getDate() - endDaysAgo);
+        const result = await this.client.calls.list({
+        createdAtGe: startDate.toISOString(),
+        createdAtLe: endDate.toISOString(),
       });
       return result;
     } catch (error) {
@@ -64,8 +84,37 @@ export class VoiceAgentService {
           transcript = VALUES(transcript)
       `;
       for (const call of calls) {
-        if (!call.analysis.structuredData) continue;
-        console.log(call.analysis);
+        if (!call.analysis.structuredData || !call.customer) continue;        
+        await this.pool.query(sql, [
+          call.analysis.structuredData.name,
+          call.customer.number,
+          call.analysis.summary,
+        ]);
+      }
+    } catch (error) {
+      throw new HttpException(
+        `VAPI API request failed: ${error.message}`,
+        error.response?.status || 500,
+      );
+    }
+  }
+  async saveCallsInRange(startDaysAgo: number, endDaysAgo: number): Promise<any> {
+    try {
+      const calls = await this.getCallsInRange(startDaysAgo, endDaysAgo);
+      const sql = `
+        INSERT INTO voice_agent (name, phone_number, transcript) 
+        VALUES (?, ?, ?) 
+        ON DUPLICATE KEY UPDATE 
+          name = VALUES(name), 
+          transcript = VALUES(transcript)
+      `;
+      for (const call of calls) {
+        if (!call.analysis.structuredData || !call.customer) continue;
+        await this.pool.query(sql, [
+          call.analysis.structuredData.name,
+          call.customer.number,
+          call.analysis.summary,
+        ]);
       }
     } catch (error) {
       throw new HttpException(

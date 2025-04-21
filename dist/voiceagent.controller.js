@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoiceAgentController = void 0;
 const common_1 = require("@nestjs/common");
@@ -20,8 +23,14 @@ let VoiceAgentController = class VoiceAgentController {
     async getCallsToday() {
         return this.voiceAgentService.getCallsToday();
     }
-    async getTranscript() {
+    async saveTodaysCalls() {
         return this.voiceAgentService.saveTodaysCalls();
+    }
+    async cronSaveCallsToday() {
+        return this.voiceAgentService.cronSaveCallsToday();
+    }
+    async saveCallsInRange(startDaysAgo, endDaysAgo) {
+        return this.voiceAgentService.saveCallsInRange(startDaysAgo, endDaysAgo);
     }
 };
 exports.VoiceAgentController = VoiceAgentController;
@@ -32,11 +41,25 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], VoiceAgentController.prototype, "getCallsToday", null);
 __decorate([
-    (0, common_1.Get)('transcript'),
+    (0, common_1.Post)('saveCallsToday'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], VoiceAgentController.prototype, "getTranscript", null);
+], VoiceAgentController.prototype, "saveTodaysCalls", null);
+__decorate([
+    (0, common_1.Post)('cronSaveCallsToday'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], VoiceAgentController.prototype, "cronSaveCallsToday", null);
+__decorate([
+    (0, common_1.Post)('saveCallsDateRange'),
+    __param(0, (0, common_1.Query)('startDaysAgo')),
+    __param(1, (0, common_1.Query)('endDaysAgo')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:returntype", Promise)
+], VoiceAgentController.prototype, "saveCallsInRange", null);
 exports.VoiceAgentController = VoiceAgentController = __decorate([
     (0, common_1.Controller)('vapi'),
     __metadata("design:paramtypes", [voiceagent_service_1.VoiceAgentService])

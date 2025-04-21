@@ -12,6 +12,9 @@ export declare class VoiceAgentService {
     constructor();
     onModuleInit(): Promise<void>;
     onModuleDestroy(): Promise<void>;
+    cronSaveCallsToday(): Promise<void>;
     getCallsToday(): Promise<any>;
+    getCallsInRange(startDaysAgo: number, endDaysAgo: number): Promise<any>;
     saveTodaysCalls(): Promise<any>;
+    saveCallsInRange(startDaysAgo: number, endDaysAgo: number): Promise<any>;
 }
