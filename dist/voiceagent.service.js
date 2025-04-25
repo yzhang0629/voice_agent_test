@@ -80,19 +80,27 @@ let VoiceAgentService = class VoiceAgentService {
         try {
             const calls = await this.getCallsToday();
             const sql = `
-        INSERT INTO voice_agent (name, phone_number, transcript) 
-        VALUES (?, ?, ?) 
+        INSERT INTO voice_agent (name, phone_number, transcript, call_start_time, event, summary) 
+        VALUES (?, ?, ?, ?, ?, ?) 
         ON DUPLICATE KEY UPDATE 
           name = VALUES(name), 
           transcript = VALUES(transcript)
       `;
             for (const call of calls) {
-                if (!call.analysis.structuredData || !call.customer)
+                if (!call.analysis.structuredData
+                    || !call.analysis.structuredData.event
+                    || !call.analysis.structuredData.name
+                    || !call.customer)
                     continue;
+                const mysqlDatetime = new Date(call.startedAt).toISOString().slice(0, 19).replace('T', ' ');
+                console.log(mysqlDatetime);
                 await this.pool.query(sql, [
                     call.analysis.structuredData.name,
                     call.customer.number,
-                    call.analysis.summary,
+                    call.transcript,
+                    mysqlDatetime,
+                    call.analysis.structuredData.event,
+                    call.analysis.summary
                 ]);
             }
         }
