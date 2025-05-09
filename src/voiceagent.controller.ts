@@ -9,6 +9,12 @@ export class VoiceAgentController {
   async getCallsToday(): Promise<any> {
     return this.voiceAgentService.getCallsToday();
   }
+  @Post('create-call')
+  async createCall(
+    @Query('phone_number') phone_number: string
+  ): Promise<any> {
+    return this.voiceAgentService.callUser(phone_number);
+  }
   @Post('saveCallsToday')
   async saveTodaysCalls(): Promise<any> {
     return this.voiceAgentService.saveTodaysCalls();

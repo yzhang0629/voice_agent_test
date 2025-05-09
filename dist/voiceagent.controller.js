@@ -23,6 +23,9 @@ let VoiceAgentController = class VoiceAgentController {
     async getCallsToday() {
         return this.voiceAgentService.getCallsToday();
     }
+    async createCall(phone_number) {
+        return this.voiceAgentService.callUser(phone_number);
+    }
     async saveTodaysCalls() {
         return this.voiceAgentService.saveTodaysCalls();
     }
@@ -40,6 +43,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], VoiceAgentController.prototype, "getCallsToday", null);
+__decorate([
+    (0, common_1.Post)('create-call'),
+    __param(0, (0, common_1.Query)('phone_number')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], VoiceAgentController.prototype, "createCall", null);
 __decorate([
     (0, common_1.Post)('saveCallsToday'),
     __metadata("design:type", Function),

@@ -30,6 +30,10 @@ let VoiceAgentService = class VoiceAgentService {
     constructor() {
         if (!this.vapi_api_key)
             throw new Error('VAPI_API_KEY is not set');
+        if (!this.assistant_id)
+            throw new Error('VAPI_ASSISTANT_ID is not set');
+        if (!this.phone_number_id)
+            throw new Error('VAPI_PHONE_NUMBER_ID is not set');
         this.client = new server_sdk_1.VapiClient({ token: this.vapi_api_key });
     }
     async onModuleInit() {
@@ -48,6 +52,24 @@ let VoiceAgentService = class VoiceAgentService {
     }
     async cronSaveCallsToday() {
         await this.saveTodaysCalls();
+    }
+    async callUser(phone_number) {
+        const response = await fetch("https://api.vapi.ai/call", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + this.vapi_api_key,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "assistantId": this.assistant_id,
+                "phoneNumberId": this.phone_number_id,
+                "customer": {
+                    "number": "+1" + phone_number
+                }
+            }),
+        });
+        const body = await response.json();
+        return body;
     }
     async getCallsToday() {
         try {

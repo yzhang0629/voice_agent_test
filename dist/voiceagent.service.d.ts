@@ -13,6 +13,7 @@ export declare class VoiceAgentService {
     onModuleInit(): Promise<void>;
     onModuleDestroy(): Promise<void>;
     cronSaveCallsToday(): Promise<void>;
+    callUser(phone_number: string): Promise<any>;
     getCallsToday(): Promise<any>;
     getCallsInRange(startDaysAgo: number, endDaysAgo: number): Promise<any>;
     saveTodaysCalls(): Promise<any>;
